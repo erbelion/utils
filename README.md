@@ -84,7 +84,7 @@ urlParams('https://github.com/erbelion/utils?a=1&b=2') // { a: 1, b: 2 }
 urlParams('') // {}
 
 // if no arg is given, then browser url is taken (window.location.href)
-urlParams() // https://github.com/erbelion/utils
+urlParams() // {}
 ```
 
 ### setUrlParams
