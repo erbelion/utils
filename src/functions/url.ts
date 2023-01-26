@@ -1,17 +1,27 @@
-// author Pavlo https://stackoverflow.com/a/43467144/5827880
-export function isUrl(text: string): boolean {
+// source Pavlo https://stackoverflow.com/a/43467144/5827880
+// source Vikasdeep Singh https://stackoverflow.com/a/49849482/5827880 
+export function isUrl(text: string, strict?: boolean): boolean {
+    if(!strict) {
+        var res = text.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)
+        return (res !== null)
+    }
+    
     let url: URL
     try {
         url = new URL(text)
     } catch (_) {
         return false
     }
-    return url.protocol === "http:" || url.protocol === "https:"
+    return strict ? url.protocol === "http:" || url.protocol === "https:" : true
+}
+
+export type urlParamsType = {
+    [key: string]: string
 }
 
 // get search params from url
 // source Quentin https://stackoverflow.com/a/979995/5827880
-export function urlParams(text?: string): object {
+export function urlParams(text?: string): urlParamsType {
     if(typeof window !== 'undefined' && typeof text === 'undefined')
         text = window.location.href
 
@@ -28,12 +38,14 @@ export function urlParams(text?: string): object {
 }
 
 // set search params to url or object
-export function setUrlParams(newUrlParams: object, urlOrParams: string | object): object {
+export function updateUrlParams(newUrlParams: urlParamsType, urlOrParams?: string | object): urlParamsType {
     if(typeof window !== 'undefined' && typeof urlOrParams === 'undefined')
         urlOrParams = window.location.href
 
-    if(typeof urlOrParams === 'object')
-        return { ...urlOrParams, ...newUrlParams}
+    if(typeof urlOrParams === 'object'){
+        const removeNullish = (obj: object) => Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != null))
+        return { ...removeNullish(urlOrParams), ...removeNullish(newUrlParams) }
+    }   
 
     if(!isUrl(urlOrParams))
         return {}
@@ -44,11 +56,10 @@ export function setUrlParams(newUrlParams: object, urlOrParams: string | object)
 
     let paramsWithoutEmpties = new URLSearchParams()
     for (const p of params)
-        if(p[1] !== '')
+        if(p[1] || p[1] === '0')
             paramsWithoutEmpties.set(p[0], p[1])
 
     if(typeof window !== 'undefined' && urlOrParams === window.location.href){
-
         window.history.replaceState({}, '', Array.from(paramsWithoutEmpties).length > 0 ? `${window.location.pathname}?${paramsWithoutEmpties}` : window.location.pathname)
     }
 
