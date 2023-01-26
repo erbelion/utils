@@ -1,6 +1,6 @@
 {
   "name": "@erbelion/utils",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A collection of simple javascript utility functions for use in browser and node.js apps.",
   "author": "erbelion",
   "keywords": [
